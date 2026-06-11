@@ -1,75 +1,58 @@
-# React + TypeScript + Vite
+# Achievimental
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Visão Geral
 
-Currently, two official plugins are available:
+A ideia principal do projeto é desenvolver um Web App que reúna as conquistas do Xbox, PlayStation e Steam, proporcionando aos usuários uma visualização unificada e centralizada de todo o seu progresso no mundo dos games.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Arquitetura
 
-## React Compiler
+A princípio, o projeto está dividido em duas aplicações principais: uma para o _backend_ e outra para o _frontend_. A arquitetura de infraestrutura final (como _Monolith_ ou _Microservices_) será definida conforme o amadurecimento da plataforma.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### Backend
 
-Note: This will impact Vite dev & build performances.
+O _backend_ está sendo construído em Node.js sobre o ecossistema do **Express**, fornecendo comunicação via **API REST**.
 
-## Expanding the ESLint configuration
+#### Design Patterns
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Para garantir que o código seja limpo, testável e escalável, o projeto adota rigorosamente padrões de projeto (_Design Patterns_), destacando-se:
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+- **Facade Pattern:** Para simplificar o consumo das complexas APIs externas.
+- **Factory Pattern:** Para instanciar dinamicamente as integrações de cada plataforma.
+- **Adapter Pattern:** Para padronizar a comunicação com diferentes serviços de terceiros (como a API do Xbox).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+#### Estrutura de Diretórios
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+O _backend_ utiliza uma arquitetura baseada em _services_ e _routes_, com uma separação clara de responsabilidades. O esquema de pastas organiza-se da seguinte forma:
+
+```txt
+src/
+├── errors/
+├── routes/
+├── services/
+│   └── xbox/
+│       ├── adapter/
+│       ├── facade/
+│       ├── factory/
+│       └── interface/
+├── app.ts
+└── server.ts
+
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Frontend
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+O _frontend_ foi projetado como uma Single Page Application (SPA), utilizando a biblioteca **React** em conjunto com o **Vite** para garantir um ambiente de desenvolvimento rápido e otimizado.
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+#### Estrutura de Diretórios
+
+Até o momento, o esquema de pastas inicial foca em separar os componentes visuais dos serviços de consumo de API:
+
+```txt
+src/
+├── components/
+├── services/
+│   └── xbox/
+├── App.ts
+└── main.ts
+
 ```
