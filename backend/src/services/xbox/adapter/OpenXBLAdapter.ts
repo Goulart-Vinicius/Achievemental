@@ -1,6 +1,6 @@
 import { AppError } from "../../../errors/AppError";
 import type { IXboxApiAdapter } from "../interface/IXboxApiAdapter";
-import { Axios } from "axios";
+import { type AxiosInstance } from "axios";
 
 const OPEN_XBL_API_BASE_URL = "https://api.xbl.io/v2";
 
@@ -9,11 +9,62 @@ export interface IOpenXBLErrorPayload {
   message: string;
 }
 
+export interface IOpenXBLPayload<T> {
+  content: T;
+  code: number;
+}
+
+export interface IOpenXBLAchievementStats {
+  currentAchievements: number;
+  totalAchievements: number;
+  currentGamerscore: number;
+  totalGamerscore: number;
+  progressPercentage: number;
+  sourceVersion: number;
+}
+
+export interface IOpenXBLGameTitle {
+  titleId: string;
+  pfn: string;
+  bingId: string;
+  windowsPhoneProductId: string;
+  name: string;
+  type: string;
+  devices: string[];
+  displayImage: string;
+  mediaItemType: string;
+  modernTitleId: string;
+  isBundle: boolean;
+  achievement: IOpenXBLAchievementStats;
+  stats: {
+    sourceVersion: number;
+  };
+  gamePass: unknown;
+  images: unknown;
+  titleHistory: {
+    lastTimePlayed: string;
+    visible: boolean;
+    canHide: boolean;
+  };
+  titleRecord: unknown;
+  detail: unknown;
+  friendsWhoPlayed: unknown;
+  alternateTitleIds: unknown;
+  contentBoards: unknown;
+  xboxLiveTier: string;
+  isStreamable: boolean;
+}
+
+export interface IOpenXBLPlayerAchievementsResponse {
+  xuid: string;
+  titles: IOpenXBLGameTitle[];
+}
+
 export class OpenXBLAdapter implements IXboxApiAdapter {
-  private readonly apiClient: Axios;
+  private readonly apiClient: AxiosInstance;
   private readonly apiKey: string;
 
-  constructor(apiClient: Axios) {
+  constructor(apiClient: AxiosInstance) {
     this.apiClient = apiClient;
     this.apiKey = process.env.OPEN_XBL_API_KEY || "";
   }
@@ -55,7 +106,9 @@ export class OpenXBLAdapter implements IXboxApiAdapter {
     }
   }
 
-  async getPlayerAchievements(uid: string): Promise<any> {
+  async getPlayerAchievements(
+    uid: string,
+  ): Promise<IOpenXBLPayload<IOpenXBLPlayerAchievementsResponse>> {
     const encodedXuid = encodeURIComponent(uid);
     const url = `${OPEN_XBL_API_BASE_URL}/achievements/player/${encodedXuid}`;
 
@@ -72,7 +125,10 @@ export class OpenXBLAdapter implements IXboxApiAdapter {
     };
 
     try {
-      const response = await this.apiClient.request(options);
+      const response =
+        await this.apiClient.request<
+          IOpenXBLPayload<IOpenXBLPlayerAchievementsResponse>
+        >(options);
 
       const parsedData =
         typeof response.data === "string" ?
@@ -85,7 +141,7 @@ export class OpenXBLAdapter implements IXboxApiAdapter {
         this.verifyError(parsedData.code, parsedData);
       }
 
-      return parsedData;
+      return parsedData as IOpenXBLPayload<IOpenXBLPlayerAchievementsResponse>;
     } catch (error: any) {
       if (error.response) {
         this.verifyError(error.response.status, error.response.data);
