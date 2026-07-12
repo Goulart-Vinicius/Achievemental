@@ -8,7 +8,6 @@ import express, {
 } from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import "express-async-errors";
 
 import xboxRouter from "./routes/xbox";
 import { fileURLToPath } from "url";

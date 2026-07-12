@@ -1,11 +1,9 @@
 /**
  * Module dependencies.
  */
+import "dotenv/config";
 import app from "./app";
 import debug from "debug";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const log = debug("backend:server");
 
